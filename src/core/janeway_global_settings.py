@@ -22,6 +22,7 @@ import sys
 import logging
 
 from django.contrib import messages
+from datetime import timedelta
 
 from core import plugin_installed_apps
 from utils.const import get_allowed_html_tags, get_allowed_css_styles
@@ -622,11 +623,22 @@ INSTALLATION_BASE_THEME = 'OLH'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
+
+
 # Use pagination for all of our APIs based on Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
 TINYMCE_CLIPBOARD_CLEANER = {
     # Settings required to optionally clean formatting from a paste event
     # Install a callback to capture the original input from clipboard
