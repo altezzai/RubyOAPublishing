@@ -19,12 +19,13 @@ from django.urls import NoReverseMatch, reverse
 from django.shortcuts import render, get_object_or_404, redirect, Http404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, QueryDict, JsonResponse
 from django.contrib.sessions.models import Session
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.conf import settings as django_settings
+from django.middleware.csrf import get_token
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.contenttypes.models import ContentType
@@ -305,23 +306,29 @@ def reset_password(request, token):
 
     return render(request, template, context)
 
-
 def register(request):
     """
-    Displays a form for users to register with the journal. If the user is registering on a journal we give them
-    the Author role.
+    Displays a form for users to register with the journal and handles API requests.
+    If the user is registering on a journal we give them the Author role.
     :param request: HttpRequest object
-    :return: HttpResponse object
+    :return: HttpResponse object or JsonResponse for API requests
     """
     context = {}
     initial = {}
-    token, token_obj = request.GET.get('token', None), None
+    is_api_request = request.headers.get('X-Axios-Request') == 'true'
+
+    data = request.POST
+
+    if is_api_request:
+        token = data.get('token')
+    else:
+        token = request.GET.get('token')
+
+    token_obj = None
     if token:
         token_obj = get_object_or_404(models.OrcidToken, token=token)
         orcid_details = orcid.get_orcid_record_details(token_obj.orcid)
-        # we use the full orcid uri for display
         context["orcid"] = orcid_details["uri"]
-        # but we save only the orcid (not uri) in the db
         initial["orcid"] = orcid_details["orcid"]
         initial["first_name"] = orcid_details.get("first_name", "")
         initial["last_name"] = orcid_details.get("last_name", "")
@@ -334,18 +341,14 @@ def register(request):
                 initial["country"] = models.Country.objects.get(code=orcid_details['country'])
 
     form = forms.RegistrationForm(
+        data or None,
         journal=request.journal,
         initial=initial,
+        is_api_request=True,
     )
 
-    if request.POST:
-        form = forms.RegistrationForm(
-            request.POST,
-            journal=request.journal,
-        )
-
+    if request.method == 'POST' or is_api_request:
         password_policy_check = logic.password_policy_check(request)
-
         if password_policy_check:
             for policy_fail in password_policy_check:
                 form.add_error('password_1', policy_fail)
@@ -354,11 +357,12 @@ def register(request):
             if token_obj:
                 new_user = form.save()
                 token_obj.delete()
-                # If the email matches the user email on ORCID, log them in
                 if new_user.email == initial.get("email"):
                     new_user.is_active = True
                     new_user.save()
                     login(request, new_user)
+                    if is_api_request:
+                        return JsonResponse({"success": True, "message": "User registered and logged in"})
                     if request.GET.get('next'):
                         return redirect(request.GET.get('next'))
                     elif request.journal:
@@ -367,22 +371,23 @@ def register(request):
                         return redirect(reverse('website_index'))
             else:
                 new_user = form.save()
-
-            if request.journal:
-                new_user.add_account_role('author', request.journal)
-            logic.send_confirmation_link(request, new_user)
-
-            messages.add_message(
-                request, messages.SUCCESS,
-                _('Your account has been created, please follow the'
-                'instructions in the email that has been sent to you.'),
-            )
-            return redirect(reverse('core_login'))
+                if request.journal:
+                    new_user.add_account_role('author', request.journal)
+                logic.send_confirmation_link(request, new_user)
+                if is_api_request:
+                    return JsonResponse({"success": True, "message": "Account created, confirmation email sent"})
+                messages.add_message(
+                    request, messages.SUCCESS,
+                    _('Your account has been created, please follow the '
+                      'instructions in the email that has been sent to you.'),
+                )
+                return redirect(reverse('core_login'))
+        elif is_api_request:
+            return JsonResponse({"success": False, "errors": form.errors})
 
     template = 'core/accounts/register.html'
     context["form"] = form
-
-    return render(request, template, context)
+    return render(request, template, context) if not is_api_request else JsonResponse({"success": False, "errors": form.errors})
 
 
 def orcid_registration(request, token):

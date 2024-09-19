@@ -154,6 +154,7 @@ class RegistrationForm(forms.ModelForm, CaptchaForm):
 
     def __init__(self, *args, **kwargs):
         self.journal = kwargs.pop('journal', None)
+        self.is_api_request = kwargs.pop('is_api_request', False)
         super(RegistrationForm, self).__init__(*args, **kwargs)
 
         if not self.journal:
@@ -166,6 +167,8 @@ class RegistrationForm(forms.ModelForm, CaptchaForm):
             ).value
             if not send_reader_notifications:
                 self.fields.pop('register_as_reader')
+        if self.is_api_request:
+            self.fields.pop('captcha', None)
 
     def clean_password_2(self):
         password_1 = self.cleaned_data.get("password_1")
