@@ -50,6 +50,7 @@ from proofing import logic as proofing_logic
 from proofing import models as proofing_models
 from press import forms as press_forms
 from utils import models as util_models, setting_handler, orcid
+from utils.jwt import generate_jwt_token
 from utils.logger import get_logger
 from utils.decorators import GET_language_override
 from utils.shared import language_override_redirect, clear_cache
@@ -62,7 +63,7 @@ logger = get_logger(__name__)
 
 def user_login(request):
     """
-    Allows an unauthenticated user to login
+    Allows an unauthenticated user to login and generates a JWT for Node.js backend
     :param request: HttpRequest
     :return: HttpResponse or JsonResponse
     """
@@ -72,81 +73,81 @@ def user_login(request):
         if is_api_request:
             return JsonResponse({'success': False, 'message': 'You are already logged in.'})
         messages.info(request, 'You are already logged in.')
-        if request.GET.get('next'):
-            return redirect(request.GET.get('next'))
-        else:
-            return redirect(reverse('website_index'))
-    else:
-        bad_logins = logic.check_for_bad_login_attempts(request)
-        if bad_logins >= 10:
-            if is_api_request:
-                return JsonResponse({'success': False, 'message': 'You have been banned from logging in due to failed attempts.'})
-            messages.info(request, _('You have been banned from logging in due to failed attempts.'))
-            logger.warning("[LOGIN_DENIED][FAILURES:%d]" % bad_logins)
-            return redirect(reverse('website_index'))
+        return redirect(request.GET.get('next') or reverse('website_index'))
 
-        form = forms.LoginForm(bad_logins=bad_logins)
-
-        if request.method == 'POST':
-            data = request.POST
-            form = forms.LoginForm(data, bad_logins=bad_logins)
-
-            if form.is_valid():
-                user = data.get('user_name').lower()
-                pawd = data.get('user_pass')
-                user = authenticate(username=user, password=pawd)
-
-                if user is not None:
-                    login(request, user)
-                    logic.clear_bad_login_attempts(request)
-                    orcid_token = data.get('orcid_token', None)
-                    if orcid_token:
-                        try:
-                            token_obj = models.OrcidToken.objects.get(token=orcid_token, expiry__gt=timezone.now())
-                            user.orcid = token_obj.orcid
-                            user.save()
-                            token_obj.delete()
-                        except models.OrcidToken.DoesNotExist:
-                            pass
-
-                    if is_api_request:
-                        return JsonResponse({'success': True, 'message': 'Login successful.'})
-
-                    messages.info(request, 'Login successful.')
-                    if request.GET.get('next'):
-                        return redirect(request.GET.get('next'))
-                    elif request.journal:
-                        return redirect(reverse('core_dashboard'))
-                    else:
-                        return redirect(reverse('website_index'))
-                else:
-                    empty_password_check = logic.no_password_check(data.get('user_name').lower())
-                    if empty_password_check:
-                        if is_api_request:
-                            return JsonResponse({'success': False, 'message': 'Password reset process has been initiated, please check your inbox for a reset request link.'})
-                        messages.add_message(request, messages.INFO, _('Password reset process has been initiated, please check your inbox for a reset request link.'))
-                        logic.start_reset_process(request, empty_password_check)
-                    else:
-                        if is_api_request:
-                            return JsonResponse({'success': False, 'message': 'Wrong email/password combination or your email address has not been confirmed yet.'})
-                        messages.add_message(request, messages.ERROR, _('Wrong email/password combination or your email address has not been confirmed yet.'))
-                    
-                    util_models.LogEntry.add_entry(types='Authentication',
-                                                   description='Failed login attempt for user {0}'.format(data.get('user_name')),
-                                                   level='Info', actor=None, request=request)
-                    logic.add_failed_login_attempt(request)
-
-            elif is_api_request:
-                return JsonResponse({'success': False, 'errors': form.errors})
-
+    bad_logins = logic.check_for_bad_login_attempts(request)
+    if bad_logins >= 10:
         if is_api_request:
-            return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+            return JsonResponse({'success': False, 'message': 'You have been banned from logging in due to failed attempts.'})
+        messages.info(request, _('You have been banned from logging in due to failed attempts.'))
+        logger.warning("[LOGIN_DENIED][FAILURES:%d]" % bad_logins)
+        return redirect(reverse('website_index'))
 
-        context = {
-            'form': form,
-        }
-        template = 'core/login.html'
-        return render(request, template, context)
+    form = forms.LoginForm(bad_logins=bad_logins)
+
+    if request.method == 'POST':
+        data = request.POST
+        orcid_token = data.get('orcid_token')
+
+        form = forms.LoginForm(data, bad_logins=bad_logins)
+
+        if form.is_valid():
+            user = authenticate(username=data.get('user_name').lower(), password=data.get('user_pass'))
+
+            if user is not None:
+                login(request, user)
+                logic.clear_bad_login_attempts(request)
+                if orcid_token:
+                    try:
+                        token_obj = models.OrcidToken.objects.get(token=orcid_token, expiry__gt=timezone.now())
+                        user.orcid = token_obj.orcid
+                        user.save()
+                        token_obj.delete()
+                    except models.OrcidToken.DoesNotExist:
+                        pass
+
+                if is_api_request:
+                    jwt_token = generate_jwt_token(user)
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'Login successful.',
+                        'jwt_token': jwt_token
+                    })
+
+                messages.info(request, 'Login successful.')
+                return redirect(request.GET.get('next') or (reverse('core_dashboard') if request.journal else reverse('website_index')))
+            else:
+                empty_password_check = logic.no_password_check(data.get('user_name').lower())
+                if empty_password_check:
+                    if is_api_request:
+                        return JsonResponse({'success': False, 'message': 'Password reset process has been initiated, please check your inbox for a reset request link.'})
+                    messages.add_message(request, messages.INFO, _('Password reset process has been initiated, please check your inbox for a reset request link.'))
+                    logic.start_reset_process(request, empty_password_check)
+                else:
+                    if is_api_request:
+                        return JsonResponse({'success': False, 'message': 'Wrong email/password combination or your email address has not been confirmed yet.'})
+                    messages.add_message(request, messages.ERROR, _('Wrong email/password combination or your email address has not been confirmed yet.'))
+                
+                util_models.LogEntry.add_entry(types='Authentication',
+                                            description='Failed login attempt for user {0}'.format(data.get('user_name')),
+                                            level='Info', actor=None, request=request)
+                logic.add_failed_login_attempt(request)
+
+                return JsonResponse({'success': False, 'message': 'Login failed.'}) if is_api_request else None
+
+        elif is_api_request:
+            return JsonResponse({'success': False, 'errors': form.errors})
+
+        # If we reach here, it's a failed Django form submission
+        context = {'form': form}
+        return render(request, 'core/login.html', context)
+
+    if is_api_request:
+        return JsonResponse({'success': False, 'message': 'Invalid request method.'})
+
+    context = {'form': form}
+    return render(request, 'core/login.html', context)
+
 
 def user_login_orcid(request):
     """

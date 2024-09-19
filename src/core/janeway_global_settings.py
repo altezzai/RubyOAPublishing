@@ -22,7 +22,6 @@ import sys
 import logging
 
 from django.contrib import messages
-from datetime import timedelta
 
 from core import plugin_installed_apps
 from utils.const import get_allowed_html_tags, get_allowed_css_styles
@@ -40,6 +39,8 @@ sys.path.append(os.path.join(BASE_DIR, "plugins"))
 # SECURITY WARNING: keep the secret key used in production secret!
 # You should change this key before you go live!
 SECRET_KEY = 'uxprsdhk^gzd-r=_287byolxn)$k6tsd8_cepl^s^tms2w1qrv'
+
+JWT_SECRET_KEY = 'changethisjwtsecret'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -486,7 +487,7 @@ ORCID_CLIENT_SECRET = ''
 ORCID_CLIENT_ID = ''
 
 SESSION_ENGINE = 'utils.sessions.janeway_db'
-SESSION_COOKIE_NAME = 'JANEWAYSESSID'
+SESSION_COOKIE_NAME = 'RUBYSESSID'
 
 S3_ACCESS_KEY = ''
 S3_SECRET_KEY = ''
@@ -629,14 +630,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-}
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
 TINYMCE_CLIPBOARD_CLEANER = {
