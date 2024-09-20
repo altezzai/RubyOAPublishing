@@ -25,6 +25,10 @@ from django.contrib import messages
 
 from core import plugin_installed_apps
 from utils.const import get_allowed_html_tags, get_allowed_css_styles
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv(os.path.join(os.path.dirname(__file__), '../.env'))
 
 # X_FRAME_OPTIONS must be set to SAMEORIGIN or the embedded PDF viewer will not work
 X_FRAME_OPTIONS = "SAMEORIGIN"
@@ -40,7 +44,7 @@ sys.path.append(os.path.join(BASE_DIR, "plugins"))
 # You should change this key before you go live!
 SECRET_KEY = 'uxprsdhk^gzd-r=_287byolxn)$k6tsd8_cepl^s^tms2w1qrv'
 
-JWT_SECRET_KEY = 'changethisjwtsecret'
+JWT_SECRET_KEY = os.environ.get('JWTSECRET','jwtsecretdefault')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

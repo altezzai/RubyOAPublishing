@@ -89,6 +89,12 @@ def send_email(
         # Avoid empty mailboxes for servers not compliant with RFC 5322
         kwargs["reply_to"] = reply_to
 
+    # if(settings.DEBUG):
+    #     print("subject :",subject,"\n")
+    #     print("content :",html,"\n")
+    #     print("from :",full_from_string,"\n")
+    #     print("to :",to,"\n")
+    #     return
     msg = EmailMultiAlternatives(subject, strip_tags(html), full_from_string, to, **kwargs)
     msg.attach_alternative(html, "text/html")
 

@@ -67,7 +67,7 @@ def user_login(request):
     :param request: HttpRequest
     :return: HttpResponse or JsonResponse
     """
-    is_api_request = request.headers.get('X-Axios-Request') == 'true'
+    is_api_request = request.headers.get('X-Api-Request') == 'true'
 
     if request.user.is_authenticated:
         if is_api_request:
@@ -316,7 +316,7 @@ def register(request):
     """
     context = {}
     initial = {}
-    is_api_request = request.headers.get('X-Axios-Request') == 'true'
+    is_api_request = request.headers.get('X-Api-Request') == 'true'
 
     data = request.POST
 
