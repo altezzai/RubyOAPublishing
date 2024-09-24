@@ -25,7 +25,6 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.conf import settings as django_settings
-from django.middleware.csrf import get_token
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.contenttypes.models import ContentType
@@ -60,6 +59,9 @@ from events import logic as events_logic
 
 logger = get_logger(__name__)
 
+@ensure_csrf_cookie
+def set_csrf_token(request):
+    return JsonResponse({"message": "CSRF cookie set"})
 
 def user_login(request):
     """
