@@ -1,3 +1,6 @@
+# This file was modified by Aswin-Koroth on Thu Sep 25 2024.
+# - Modified Account model.
+
 __copyright__ = "Copyright 2017 Birkbeck, University of London"
 __author__ = "Martin Paul Eve & Andy Byers"
 __license__ = "AGPL v3"
