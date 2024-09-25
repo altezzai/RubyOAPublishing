@@ -135,7 +135,6 @@ def user_login(request):
                                             level='Info', actor=None, request=request)
                 logic.add_failed_login_attempt(request)
 
-                return JsonResponse({'success': False, 'message': 'Login failed.'}) if is_api_request else None
 
         elif is_api_request:
             return JsonResponse({'success': False, 'errors': form.errors})
