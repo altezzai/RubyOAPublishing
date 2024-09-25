@@ -293,6 +293,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     github = models.CharField(max_length=300, null=True, blank=True, verbose_name=_('Github Username'))
     profile_image = models.ImageField(upload_to=profile_images_upload_path, null=True, blank=True, storage=fs, verbose_name=("Profile Image"))
     email_sent = models.DateTimeField(blank=True, null=True)
+    banned_at = models.DateTimeField(blank=True, null=True)
+    citizen_deactive_at = models.DateTimeField(blank=True, null=True)
     date_confirmed = models.DateTimeField(blank=True, null=True)
     confirmation_code = models.CharField(max_length=200, blank=True, null=True, verbose_name=_("Confirmation Code"))
     signature = JanewayBleachField(
@@ -317,6 +319,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    is_banned = models.BooleanField(default=False)
+    is_citizen_active = models.BooleanField(default=False)
 
     enable_digest = models.BooleanField(
         default=False,
