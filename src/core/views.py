@@ -407,28 +407,39 @@ def orcid_registration(request, token):
 def activate_account(request, token):
     """
     Activates a user account if an Account object with the
-    matching token is found and is not already active.
+    matching token is found and is not already active.Supports
+    both API requests and Django frontend requests.
     :param request: HttpRequest object
     :param token: string, Account.confirmation_token
-    :return: HttpResponse object
+    :return: HttpResponse object or JsonResponse object
     """
+
+    is_api_request = request.headers.get('X-Api-Request') == 'true'
+
     try:
         account = models.Account.objects.get(confirmation_code=token, is_active=False)
     except models.Account.DoesNotExist:
         account = None
 
-    if account and request.POST:
+    if account and (request.POST or is_api_request):
         account.is_active = True
         account.confirmation_code = None
         account.save()
 
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _('Account activated'),
-        )
+        if is_api_request:
+            return JsonResponse({'success': True, 'message': 'Account activated successfully'}, status=200)
+        else:
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                _('Account activated'),
+            )
+            return redirect(reverse('core_login'))
+    
+    if is_api_request:
+        if not account:
+            return JsonResponse({'success': False, 'error': 'Invalid token or account already active'}, status=404)
 
-        return redirect(reverse('core_login'))
 
     template = 'core/accounts/activate_account.html'
     context = {
