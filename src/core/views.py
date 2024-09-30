@@ -127,7 +127,7 @@ def user_login(request):
                         token_obj.delete()
                     except models.OrcidToken.DoesNotExist:
                         pass
-                ret_message = "Login successful.",
+                ret_message = "Login successful."
                 if is_api_request:
                     jwt_token = generate_jwt_token(user)
                     return JsonResponse(
@@ -286,7 +286,7 @@ def user_login_orcid(request):
             messages.add_message(
                 request,
                 messages.WARNING,
-                ret_message,
+                _(ret_message),
             )
             return redirect(reverse("core_login"))
     else:
@@ -296,7 +296,7 @@ def user_login_orcid(request):
         messages.add_message(
             request,
             messages.WARNING,
-            ret_message,
+            _(ret_message),
         )
         return redirect(reverse("core_login"))
 
@@ -308,7 +308,11 @@ def user_logout(request):
     :param request: HttpRequest object
     :return: HttpResponse object
     """
-    messages.info(request, _("You have been logged out."))
+    is_api_request = request.headers.get("X-Api-Request") == "true"
+    ret_message = "You have been logged out."
+    if is_api_request:
+        return JsonResponse({"success": True, "message": ret_message})
+    messages.info(request, _(ret_message))
     logout(request)
     return redirect(reverse("website_index"))
 
@@ -346,7 +350,7 @@ def get_reset_token(request):
                     messages.add_message(
                         request,
                         messages.INFO,
-                        message_str,
+                        _(message_str),
                     )
                     return redirect(reverse("core_login"))
 
@@ -403,19 +407,17 @@ def reset_password(request, token):
             reset_token.account.save()
             reset_token.expired = True
             reset_token.save()
+            ret_message = "Password has been reset successfully."
             if is_api_request:
                 return JsonResponse(
                     {
                         "success": True,
-                        "message": "Password has been reset successfully.",
+                        "message": ret_message,
                     },
                     status=200,
                 )
             else:
-
-                messages.add_message(
-                    request, messages.SUCCESS, "Your password has been reset."
-                )
+                messages.add_message(request, messages.SUCCESS, _(ret_message))
                 return redirect(reverse("core_login"))
 
         if is_api_request:
