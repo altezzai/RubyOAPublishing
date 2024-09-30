@@ -80,25 +80,18 @@ def user_login(request):
     is_api_request = request.headers.get("X-Api-Request") == "true"
 
     if request.user.is_authenticated:
+        ret_message = "You are already logged in."
         if is_api_request:
-            return JsonResponse(
-                {"success": True, "message": "You are already logged in."}
-            )
-        messages.info(request, "You are already logged in.")
+            return JsonResponse({"success": True, "message": ret_message})
+        messages.info(request, ret_message)
         return redirect(request.GET.get("next") or reverse("website_index"))
 
     bad_logins = logic.check_for_bad_login_attempts(request)
     if bad_logins >= 10:
+        ret_message = "You have been banned from logging in due to failed attempts."
         if is_api_request:
-            return JsonResponse(
-                {
-                    "success": False,
-                    "message": "You have been banned from logging in due to failed attempts.",
-                }
-            )
-        messages.info(
-            request, _("You have been banned from logging in due to failed attempts.")
-        )
+            return JsonResponse({"success": False, "message": ret_message})
+        messages.info(request, _(ret_message))
         logger.warning("[LOGIN_DENIED][FAILURES:%d]" % bad_logins)
         return redirect(reverse("website_index"))
 
@@ -116,6 +109,12 @@ def user_login(request):
             )
 
             if user is not None:
+                if user.is_banned:
+                    message = "You are banned from logging in."
+                    if is_api_request:
+                        return JsonResponse({"success": False, "message": message})
+                    messages.info(request, message)
+                    return redirect(request.GET.get("next") or reverse("core_login"))
                 login(request, user)
                 logic.clear_bad_login_attempts(request)
                 if orcid_token:
@@ -128,18 +127,18 @@ def user_login(request):
                         token_obj.delete()
                     except models.OrcidToken.DoesNotExist:
                         pass
-
+                ret_message = "Login successful.",
                 if is_api_request:
                     jwt_token = generate_jwt_token(user)
                     return JsonResponse(
                         {
                             "success": True,
-                            "message": "Login successful.",
+                            "message": ret_message,
                             "jwt_token": jwt_token,
                         }
                     )
 
-                messages.info(request, "Login successful.")
+                messages.info(request, ret_message)
                 return redirect(
                     request.GET.get("next")
                     or (
@@ -153,35 +152,34 @@ def user_login(request):
                     data.get("user_name").lower()
                 )
                 if empty_password_check:
+                    ret_message = "Password reset process has been initiated, please check your inbox for a reset request link."
                     if is_api_request:
                         return JsonResponse(
                             {
                                 "success": False,
-                                "message": "Password reset process has been initiated, please check your inbox for a reset request link.",
+                                "message": ret_message,
                             }
                         )
                     messages.add_message(
                         request,
                         messages.INFO,
-                        _(
-                            "Password reset process has been initiated, please check your inbox for a reset request link."
-                        ),
+                        _(ret_message),
                     )
+
                     logic.start_reset_process(request, empty_password_check)
                 else:
+                    ret_message = "Wrong email/password combination or your email address has not been confirmed yet."
                     if is_api_request:
                         return JsonResponse(
                             {
                                 "success": False,
-                                "message": "Wrong email/password combination or your email address has not been confirmed yet.",
+                                "message": ret_message,
                             }
                         )
                     messages.add_message(
                         request,
                         messages.ERROR,
-                        _(
-                            "Wrong email/password combination or your email address has not been confirmed yet."
-                        ),
+                        _(ret_message),
                     )
 
                 util_models.LogEntry.add_entry(
@@ -198,7 +196,6 @@ def user_login(request):
         elif is_api_request:
             return JsonResponse({"success": False, "message": form.errors})
 
-        # If we reach here, it's a failed Django form submission
         context = {"form": form}
         return render(request, "core/login.html", context)
 
@@ -217,6 +214,7 @@ def user_login_orcid(request):
     """
     orcid_code = request.GET.get("code", None)
     action = request.GET.get("state", "login")
+    is_api_request = request.GET.get("is_api") == "true"
 
     if orcid_code and django_settings.ENABLE_ORCID:
         orcid_id = orcid.retrieve_tokens(orcid_code, request.site_type, action=action)
@@ -224,11 +222,29 @@ def user_login_orcid(request):
         if orcid_id:
             try:
                 user = models.Account.objects.get(orcid=orcid_id)
+
                 if action == "login":
+                    if user.is_banned:
+                        message = "You are banned from logging in."
+                        if is_api_request:
+                            return JsonResponse({"success": False, "message": message})
+                        messages.info(request, message)
+                        return redirect(
+                            request.GET.get("next") or reverse("core_login")
+                        )
+
                     user.backend = "django.contrib.auth.backends.ModelBackend"
                     login(request, user)
-
-                    if request.GET.get("next"):
+                    jwt_token = generate_jwt_token(user)
+                    if is_api_request:
+                        return JsonResponse(
+                            {
+                                "success": True,
+                                "message": "Login successful.",
+                                "jwt_token": jwt_token,
+                            }
+                        )
+                    elif request.GET.get("next"):
                         return redirect(request.GET.get("next"))
                     elif request.journal:
                         return redirect(reverse("core_dashboard"))
@@ -264,17 +280,23 @@ def user_login_orcid(request):
                     )
                 )
         else:
+            ret_message = "Valid ORCiD not returned, please try again, or login with your username and password."
+            if is_api_request:
+                return JsonResponse({"success": False, "message": ret_message})
             messages.add_message(
                 request,
                 messages.WARNING,
-                "Valid ORCiD not returned, please try again, or login with your username and password.",
+                ret_message,
             )
             return redirect(reverse("core_login"))
     else:
+        ret_message = "No authorisation code provided, please try again or login with your username and password."
+        if is_api_request:
+            return JsonResponse({"success": False, "message": ret_message})
         messages.add_message(
             request,
             messages.WARNING,
-            "No authorisation code provided, please try again or login with your username and password.",
+            ret_message,
         )
         return redirect(reverse("core_login"))
 
