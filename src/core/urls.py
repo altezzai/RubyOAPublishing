@@ -6,7 +6,6 @@ __maintainer__ = "Birkbeck Centre for Technology and Publishing"
 
 from django.urls import include, re_path, path
 from django.contrib import admin
-from django.views.generic import TemplateView
 from django.conf import settings
 from django.views.static import serve
 

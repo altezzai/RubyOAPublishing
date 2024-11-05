@@ -1,3 +1,5 @@
+# This file was modified by Aswin-Koroth on Tue Nov 5 2024.
+
 __copyright__ = "Copyright 2017 Birkbeck, University of London"
 __author__ = "Martin Paul Eve & Andy Byers"
 __license__ = "AGPL v3"
@@ -52,6 +54,9 @@ def index(request):
     if request.repository is not None:
         # if there is a repository we return the repository homepage.
         return repository_views.repository_home(request)
+    
+    if request.path == '/':
+        return redirect('/journals/')
 
     homepage_elements, homepage_element_names = core_logic.get_homepage_elements(
         request,

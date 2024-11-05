@@ -609,6 +609,7 @@ CORE_THEMES = [
     "OLH",
     "material",
     "clean",
+    "RUBY"
 ]
 
 # Repository theme setting determines which themes currently
@@ -618,7 +619,7 @@ REPOSITORY_THEMES = [
     "material",
 ]
 
-INSTALLATION_BASE_THEME = "OLH"
+INSTALLATION_BASE_THEME = "RUBY"
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
