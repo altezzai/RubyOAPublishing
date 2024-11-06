@@ -21,7 +21,7 @@
                                 <div class="large-12 columns">
                                     <div class="content clearfix">
                                         <div class="row" data-equalizer>
-                                        <div class="large-4 columns" data-equalizer-watch>
+                                        <div class="large-4 columns img-con" data-equalizer-watch>
                                             {% if current_journal.is_remote %}
                                             <a href="{{ current_journal.remote_view_url }}">
                                             {% else %}
@@ -51,21 +51,21 @@
                                             {% endfor %}
                                             {% endif %}{% endwith %}
                                             </div>
-                                            <div class="expanded button-group">
+                                            <div class="btn-con">
                                                 {% if current_journal.is_remote %}
                                                     {% if not submission_disabled %}
                                                     <a href="{{ current_journal.remote_submit_url }}"
                                                        class="button"><span>{% trans 'Submit' %}</span></a>
                                                     {% endif %}
                                                     <a href="{{ current_journal.remote_view_url }}"
-                                                       class="button"><span>{% trans 'View' %}</span></a>
+                                                       class="button invert"><span>{% trans 'View' %}</span></a>
                                                 {% else %}
                                                     {% if not submission_disabled %}
                                                     <a href="{% journal_base_url current_journal %}{% url 'submission_start' %}"
                                                        class="button"><span>{% trans 'Submit' %}</span></a>
                                                     {% endif %}
                                                     <a href="{% journal_base_url current_journal %}"
-                                                       class="button"><span>{% trans 'View' %}</span></a>
+                                                       class="button invert"><span>{% trans 'View' %}</span></a>
                                                     {% if current_journal.current_issue %}
                                                     <a href="{% journal_base_url current_journal %}{% url 'current_issue' %}"
                                                        class="button"><span>{% trans 'Current Issue' %}</span></a>

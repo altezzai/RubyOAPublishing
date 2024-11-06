@@ -5,13 +5,13 @@
 
 @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css);
 
-@import 'foundation';
+@import "foundation";
 
 @import "variables";
 @import "mixins";
 
-@import 'motion-ui';
-@import 'settings';
+@import "motion-ui";
+@import "settings";
 
 @include foundation-global-styles;
 @include foundation-grid;
@@ -53,13 +53,15 @@
 @include motion-ui-transitions;
 @include motion-ui-animations;
 
-@import 'timeline';
-@import 'toastr';
-@import 'issue';
-@import 'tabs';
-@import 'tagit';
+@import "timeline";
+@import "toastr";
+@import "issue";
+@import "tabs";
+@import "tagit";
 
 :root {
+  --primary-college-color: #{$primary-college-color};
+  --primary-college-color-light: #{$primary-college-color-light};
   --primary-dark-color: #{$primary-dark-color};
   --very-dark-primary-color: #{$very-dark-primary-color};
   --primary-light-color: #{$primary-light-color};
@@ -74,50 +76,51 @@
 
   --figure-caption-background-color: #{$figure-caption-background-color};
   --figure-caption-color: #{$figure-caption-color};
-
 }
 
 a {
   color: var(--link-color);
 }
 
-#toc a, aside a {
+#toc a,
+aside a {
   color: var(--toc-link-color);
 }
 
-html, body {
-	height: 100%;
+html,
+body {
+  height: 100%;
 }
 
 .wrapper {
-	min-height: 100%;
-	margin-bottom: (-$footer-height);
-    position: relative;
-    z-index: 0;
+  min-height: 100%;
+  margin-bottom: (-$footer-height);
+  position: relative;
+  z-index: 0;
 
   &:after {
     content: "";
     display: block;
-  	height: $footer-height;
+    height: $footer-height;
   }
 }
 .main-footer {
-	height: $footer-height;
-    position: relative;
-    z-index: 0;
+  height: $footer-height;
+  position: relative;
+  z-index: 0;
 }
 
 header {
   .top-bar ul.dropdown ul {
-    background-color: #FFFFFF;
+    background-color: #ffffff;
   }
 
   .top-bar ul.dropdown ul a:hover {
-    background-color: #EBEBEB;
+    background-color: #ebebeb;
   }
 
   li.divider {
-    border-top: solid 1px #F1F1F1;
+    border-top: solid 1px #f1f1f1;
     clear: both;
     height: 1px;
     width: 100%;
@@ -157,7 +160,8 @@ header {
       }
 
       @include breakpoint(small only) {
-        li, form {
+        li,
+        form {
           width: 100%;
         }
       }
@@ -168,7 +172,8 @@ header {
       float: left;
     }
   }
-  .top-bar-left, .top-bar-right {
+  .top-bar-left,
+  .top-bar-right {
     @include breakpoint(medium) {
       height: 100%;
       padding: rem-calc(20px);
@@ -177,7 +182,8 @@ header {
   .page-title {
     line-height: 50px;
 
-    p, h4 {
+    p,
+    h4 {
       display: inline-block;
       margin: 0;
     }
@@ -224,9 +230,9 @@ header {
 
     .top-bar-image {
       max-height: $topbar-height;
-      max-width:330px;
+      max-width: 330px;
       padding: 5px;
-      margin-top:-20px;
+      margin-top: -20px;
     }
   }
 
@@ -256,7 +262,8 @@ header {
         padding: rem-calc(10px);
       }
     }
-    img, svg {
+    img,
+    svg {
       padding-left: 0.69444rem;
       max-height: $topbar-height;
       max-width: 70%;
@@ -277,12 +284,18 @@ header {
 
 .uppercase {
   text-transform: uppercase;
-  letter-spacing: .1em;
+  letter-spacing: 0.1em;
   font-family: $header-font-family;
 }
 
 .white-text {
-  h1, h2, h3, h4, h5, p, ul {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  p,
+  ul {
     color: $white;
   }
 }
@@ -340,7 +353,8 @@ header {
       }
     }
   }
-  .orbit-previous, .orbit-next {
+  .orbit-previous,
+  .orbit-next {
     color: $medium-gray;
   }
 }
@@ -359,7 +373,10 @@ header {
   z-index: 11;
 }
 
-pre {@extend blockquote; @extend p;}
+pre {
+  @extend blockquote;
+  @extend p;
+}
 
 .author-name {
   position: relative;
@@ -377,7 +394,7 @@ pre {@extend blockquote; @extend p;}
 
 .overlay {
   &:before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -398,7 +415,10 @@ pre {@extend blockquote; @extend p;}
   }
 }
 
-body, main, #orbiter, #orbitsection {
+body,
+main,
+#orbiter,
+#orbitsection {
   position: relative;
   z-index: 0;
 }
@@ -417,8 +437,8 @@ main section {
 }
 
 .math-formulae {
-    overflow-x: auto;
-    padding-bottom: 1rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
 }
 
 .dark-primary-bg {
@@ -473,21 +493,40 @@ div.caption span.label {
   position: relative;
 
   .button {
-    background-color: var(--primary-dark-color);
-    color: #FFF;
+    background-color: var(--primary-college-color);
+    color: #fff;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    min-width: 100px;
+    font-size: larger;
+    font-weight: bold;
+    margin: 0;
+    margin-right: 5px;
+  }
+  .invert {
+    background-color: #fff;
+    color: var(--primary-college-color);
+    border: 1px solid var(--primary-college-color);
   }
 
   .button:hover {
-    background-color: var(--very-dark-primary-color);
-    color: #FFF;
+    background-color: var(--primary-college-color-light);
+  }
+  .invert:hover {
+    background-color: rgb(255, 231, 231);
+    color: var(--primary-college-color);
   }
 
+  .img-con {
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 0.8rem;
 
-  img {
-    width: 100%;
-
-    &.article-thumbnail {
-      width: auto;
+      &.article-thumbnail {
+        width: auto;
+      }
     }
   }
 
@@ -521,6 +560,16 @@ div.caption span.label {
   }
 
   &.journal {
+    padding-left: 20px;
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgb(233, 233, 233);
+    border-left: 2px solid var(--primary-college-color);
+    border-radius: 0.8rem;
+
+    &:hover {
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    }
+
     .content {
       padding: rem-calc(20 0);
     }
@@ -626,7 +675,6 @@ div.caption span.label {
     padding-bottom: rem-calc(20px);
   }
   aside {
-
     .sticky {
       width: 100%;
     }
@@ -654,7 +702,7 @@ div.caption span.label {
         line-height: 1.3em;
 
         &:before {
-          content: '';
+          content: "";
           position: absolute;
           top: 50%;
           left: -56px;
@@ -768,17 +816,17 @@ table tr.active td {
 }
 
 .orbit {
-    position: relative;
-    z-index: -10;
+  position: relative;
+  z-index: -10;
 }
 
 .small-dropdown {
-    width: initial;
-    min-width: 150px;
+  width: initial;
+  min-width: 150px;
 }
 
 .pub-button {
-    min-width: 150px;
+  min-width: 150px;
 }
 
 .ui-sortable-handle {
@@ -786,60 +834,60 @@ table tr.active td {
 }
 
 .bs-callout {
-    padding: 20px;
-    margin: 20px 0;
-    border: 1px solid #eee;
-    border-left-width: 5px;
-    border-radius: 3px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid #eee;
+  border-left-width: 5px;
+  border-radius: 3px;
 }
 .bs-callout h4 {
-    margin-top: 0;
-    margin-bottom: 5px;
+  margin-top: 0;
+  margin-bottom: 5px;
 }
 .bs-callout p:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 .bs-callout code {
-    border-radius: 3px;
+  border-radius: 3px;
 }
-.bs-callout+.bs-callout {
-    margin-top: -5px;
+.bs-callout + .bs-callout {
+  margin-top: -5px;
 }
 .bs-callout-default {
-    border-left-color: #777;
+  border-left-color: #777;
 }
 .bs-callout-default h4 {
-    color: #777;
+  color: #777;
 }
 .bs-callout-primary {
-    border-left-color: #428bca;
+  border-left-color: #428bca;
 }
 .bs-callout-primary h4 {
-    color: #428bca;
+  color: #428bca;
 }
 .bs-callout-success {
-    border-left-color: #5cb85c;
+  border-left-color: #5cb85c;
 }
 .bs-callout-success h4 {
-    color: #5cb85c;
+  color: #5cb85c;
 }
 .bs-callout-danger {
-    border-left-color: #d9534f;
+  border-left-color: #d9534f;
 }
 .bs-callout-danger h4 {
-    color: #d9534f;
+  color: #d9534f;
 }
 .bs-callout-warning {
-    border-left-color: #f0ad4e;
+  border-left-color: #f0ad4e;
 }
 .bs-callout-warning h4 {
-    color: #f0ad4e;
+  color: #f0ad4e;
 }
 .bs-callout-info {
-    border-left-color: #5bc0de;
+  border-left-color: #5bc0de;
 }
 .bs-callout-info h4 {
-    color: #5bc0de;
+  color: #5bc0de;
 }
 .equilibrium {
   float: left !important;
@@ -1055,58 +1103,59 @@ button.list-group-item-danger.active:focus {
 }
 
 .contact {
-    h5 {
-        margin-bottom: 0px !important;
-    }
+  h5 {
+    margin-bottom: 0px !important;
+  }
 }
 
-.admin ul{
-    background-color: $admin-background-color !important;
+.admin ul {
+  background-color: $admin-background-color !important;
 }
 
 .editorial-image {
-    object-fit: cover;
-    width: 100%;
-    height: 220px;
+  object-fit: cover;
+  width: 100%;
+  height: 220px;
 }
 
 .article-orbit {
-    max-height: 400px !important
+  max-height: 400px !important;
 }
 
-.orbit-no-padding{
+.orbit-no-padding {
   padding: 0 !important;
 }
 
 .dyslexia-friendly {
+  font-family: Verdana !important;
+  color: #4c4c4c;
+  font-size: 14px;
+  background-color: #f5f5dc;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: Verdana !important;
     color: #4c4c4c;
-    font-size: 14px;
-    background-color: #F5F5DC;
+  }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      font-family: Verdana !important;
-      color: #4c4c4c;
-    }
+  i,
+  em {
+    font-style: normal;
+    background-color: #fafac8;
+  }
 
-    i, em {
-        font-style: normal;
-        background-color: #FAFAC8;
+  .summary {
+    .top {
+      background-color: #f5f5dc;
     }
-
-    .summary {
-        .top {
-            background-color: #F5F5DC;
-        }
-        .bottom {
-            background-color: #F5F5DC;
-        }
+    .bottom {
+      background-color: #f5f5dc;
     }
+  }
 }
 
 .pagination-block {
@@ -1124,7 +1173,8 @@ button.list-group-item-danger.active:focus {
 }
 
 .journal-description-box {
-  min-height:258px; padding-bottom: 10px;
+  min-height: 258px;
+  padding-bottom: 10px;
 }
 
 .top-bar-left svg {
@@ -1134,15 +1184,15 @@ button.list-group-item-danger.active:focus {
 }
 
 .third {
-  @extend .large-3
+  @extend .large-3;
 }
 
 .half {
-  @extend .large-6
+  @extend .large-6;
 }
 
 .full {
-  @extend .large-12
+  @extend .large-12;
 }
 
 .title-area {
@@ -1180,7 +1230,7 @@ button.list-group-item-danger.active:focus {
 }
 
 #reflist p {
-    word-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .sidebar-item a sup {
@@ -1188,11 +1238,11 @@ button.list-group-item-danger.active:focus {
 }
 
 .issue-link {
-    color: inherit;
+  color: inherit;
 }
 
 .issue-link:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .feature-article-image {
@@ -1210,7 +1260,7 @@ button.list-group-item-danger.active:focus {
 }
 
 .small-caps {
-    font-variant: small-caps
+  font-variant: small-caps;
 }
 
 .flag-button {
@@ -1222,26 +1272,25 @@ button.list-group-item-danger.active:focus {
 }
 
 .flag-active {
-    text-decoration: rgb(64, 69, 84) underline;
-    text-underline-offset: 10px;
-    text-decoration-thickness: 3px;
+  text-decoration: rgb(64, 69, 84) underline;
+  text-underline-offset: 10px;
+  text-decoration-thickness: 3px;
 }
 
 .pad-left-15 {
-	padding-left: 15px;
+  padding-left: 15px;
 }
 
 .language-menu {
-	padding-left: 15px;
+  padding-left: 15px;
 }
 
 .reveal {
   user-select: text;
 }
 
-
 .table-foot .table-footnotes li.fn {
-    list-style-type: none;
+  list-style-type: none;
 }
 
 .article-table {
@@ -1254,51 +1303,53 @@ button.list-group-item-danger.active:focus {
 }
 
 .article-table tbody tr {
-  background-color:transparent;
+  background-color: transparent;
 }
 
 #journal-title {
-    padding: 0px;
-    height:100%;
-    @include breakpoint(large down){
-      max-width: 550px;
-      h1 {
-        padding-top: 0px;
-        font-size:1.5vw;
-      }
+  padding: 0px;
+  height: 100%;
+  @include breakpoint(large down) {
+    max-width: 550px;
+    h1 {
+      padding-top: 0px;
+      font-size: 1.5vw;
     }
-    @include breakpoint(medium down){
-      max-width:80%; // Avoid running over the search and burger menus
-      padding-top: 0.7rem;
-      h1 {
-        font-size: 100%;
-      }
+  }
+  @include breakpoint(medium down) {
+    max-width: 80%; // Avoid running over the search and burger menus
+    padding-top: 0.7rem;
+    h1 {
+      font-size: 100%;
     }
-    @include breakpoint(large){
-      float: right; // Aligns title to the right of the logo
+  }
+  @include breakpoint(large) {
+    float: right; // Aligns title to the right of the logo
+  }
+  @include breakpoint(xlarge) {
+    max-width: 800px;
+    h1 {
+      padding-top: 0px;
+      font-size: 1.6vw;
     }
-    @include breakpoint(xlarge){
-      max-width: 800px;
-      h1 {
-        padding-top: 0px;
-        font-size:1.6vw;
-      }
+  }
+  @include breakpoint(xxlarge) {
+    max-width: 1000px;
+    h1 {
+      padding-top: 0px;
+      font-size: 1.7rem;
     }
-    @include breakpoint(xxlarge){
-      max-width: 1000px;
-      h1 {
-        padding-top: 0px;
-        font-size:1.70rem;
-      }
-    }
+  }
 }
 
 #search-menu {
   max-width: 200px;
-  float:right;
+  float: right;
 }
 
-.is-drilldown{overflow-y: scroll}
+.is-drilldown {
+  overflow-y: scroll;
+}
 
 .homepage-element-about {
   margin-top: 30px;
@@ -1327,4 +1378,3 @@ button.list-group-item-danger.active:focus {
 .decade_list_item:hover {
   text-decoration: underline;
 }
-

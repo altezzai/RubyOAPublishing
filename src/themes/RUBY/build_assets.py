@@ -12,13 +12,13 @@ from journal import models as journal_models
 def process_scss():
     """Compiles SCSS into CSS in the Static Assets folder"""
     paths = [
-        os.path.join(settings.BASE_DIR, 'themes/OLH/assets/foundation-sites/scss/'),
-        os.path.join(settings.BASE_DIR, 'themes/OLH/assets/motion-ui/src/')
+        os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/foundation-sites/scss/'),
+        os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/motion-ui/src/')
     ]
 
     # File dirs
-    app_scss_file = os.path.join(settings.BASE_DIR, 'themes/OLH/assets/scss/app.scss')
-    app_css_file = os.path.join(settings.BASE_DIR, 'static/OLH/css/app.css')
+    app_scss_file = os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/scss/app.scss')
+    app_css_file = os.path.join(settings.BASE_DIR, 'static/RUBY/css/app.css')
 
     compiled_css_from_file = sass.compile(filename=app_scss_file, include_paths=paths)
 
@@ -56,15 +56,15 @@ def process_js():
     """Copies JS from compile into static assets
     """
     source_paths = [
-        os.path.join(settings.BASE_DIR, 'themes/OLH/assets/js/admin.js'),
-        os.path.join(settings.BASE_DIR, 'themes/OLH/assets/js/app.js'),
-        os.path.join(settings.BASE_DIR, 'themes/OLH/assets/js/footnotes.js'),
-        os.path.join(settings.BASE_DIR, 'themes/OLH/assets/js/table_of_contents.js'),
-        os.path.join(settings.BASE_DIR, 'themes/OLH/assets/js/text_resize.js'),
-        os.path.join(settings.BASE_DIR, 'themes/OLH/assets/js/toastr.js'),
+        os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/js/admin.js'),
+        os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/js/app.js'),
+        os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/js/footnotes.js'),
+        os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/js/table_of_contents.js'),
+        os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/js/text_resize.js'),
+        os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/js/toastr.js'),
     ]
-    dest_path = os.path.join(settings.BASE_DIR, 'static/OLH/js/app.js')
-    min_path = os.path.join(settings.BASE_DIR, 'static/OLH/js/app.min.js')
+    dest_path = os.path.join(settings.BASE_DIR, 'static/RUBY/js/app.js')
+    min_path = os.path.join(settings.BASE_DIR, 'static/RUBY/js/app.min.js')
 
     process_js_files(source_paths, dest_path, min_path)
 
@@ -109,16 +109,16 @@ def copy_file(source, destination):
 
 def process_fonts():
     """Processes fonts from the compile folder into Static Assets"""
-    fonts_path = os.path.join(settings.BASE_DIR, 'themes/OLH/assets/fonts/')
-    static_fonts = os.path.join(settings.BASE_DIR, 'static/OLH/fonts/')
+    fonts_path = os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/fonts/')
+    static_fonts = os.path.join(settings.BASE_DIR, 'static/RUBY/fonts/')
 
     copy_files(fonts_path, static_fonts)
 
 
 def process_images():
     """Processes images from the compile folder into Static Assets"""
-    image_path = os.path.join(settings.BASE_DIR, 'themes/OLH/assets/img/')
-    static_images = os.path.join(settings.BASE_DIR, 'static/OLH/img/')
+    image_path = os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/img/')
+    static_images = os.path.join(settings.BASE_DIR, 'static/RUBY/img/')
 
     copy_files(image_path, static_images)
 
@@ -149,7 +149,7 @@ def process_journals(override_css_dir, paths):
 
         if os.path.isfile(journal_header_image):
             print('Journal with ID {0} [{1}]: processing header image'.format(journal.id, journal.name))
-            dest_path = os.path.join(settings.BASE_DIR, 'static', 'OLH', 'img', 'journal_header{0}.png'.format(journal.id))
+            dest_path = os.path.join(settings.BASE_DIR, 'static', 'RUBY', 'img', 'journal_header{0}.png'.format(journal.id))
 
             copy_file(journal_header_image, dest_path)
 
@@ -186,14 +186,14 @@ def process_press_override(override_css_dir, include_paths):
             f.write(compiled)
 
 def create_paths():
-    base_path = os.path.join(settings.BASE_DIR, 'static', 'OLH')
+    base_path = os.path.join(settings.BASE_DIR, 'static', 'RUBY')
     folders = ['css', 'js', 'fonts', 'img']
 
     for folder in folders:
         os.makedirs(os.path.join(base_path, folder), exist_ok=True)
 
     # test if the journal CSS directory exists and create it if not
-    override_css_dir = os.path.join(settings.BASE_DIR, 'static', 'OLH', 'css')
+    override_css_dir = os.path.join(settings.BASE_DIR, 'static', 'RUBY', 'css')
     os.makedirs(override_css_dir, exist_ok=True)
 
     return override_css_dir
@@ -207,8 +207,8 @@ def build():
     process_js()
     print("Processing journal overrides")
     include_paths = [
-        os.path.join(settings.BASE_DIR, 'themes/OLH/assets/foundation-sites/scss/'),
-        os.path.join(settings.BASE_DIR, 'themes/OLH/assets/motion-ui/src/')
+        os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/foundation-sites/scss/'),
+        os.path.join(settings.BASE_DIR, 'themes/RUBY/assets/motion-ui/src/')
     ]
     process_default_override(override_css_dir, include_paths)
     process_journals(override_css_dir, include_paths)

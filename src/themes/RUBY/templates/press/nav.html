@@ -19,7 +19,7 @@
             {% endif %}
         {% endfor %}
         {% if request.press.publishes_journals and not request.press.disable_journals %}
-        <li><a href="{% url 'press_journals' %}">{% trans 'Journals' %}</a></li>
+        <li><a href="{% url 'press_journals' %}">{% trans 'Journals RUBY' %}</a></li>
         {% endif %}
         {% if request.press.publishes_conferences%}
         <li><a href="{% url 'press_conferences' %}">{% trans 'Conferences' %}</a></li>
