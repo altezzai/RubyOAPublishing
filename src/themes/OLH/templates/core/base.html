@@ -62,7 +62,7 @@
                         {% svg_or_image request.journal.header_image css_class='header-image top-bar-image' %}
                     </a>
                     {% else %}
-                        <a href="{{ request.journal.site_url }}"><img src="{% static "common/img/sample/janeway.png" %}"></a>
+                        <a href="{{ request.journal.site_url }}"><img class="top-logo" src="{% static "common/img/sample/osp.svg" %}"></a>
                     {% endif %}
                 {% elif request.repository %}
                     {% if request.repository.logo %}
@@ -185,7 +185,7 @@
             {% elif 'svg' in request.press_cover %}
                 <a href="{% press_url request %}">{% svg request.press_cover %}</a>
             {% else %}
-                <a href="https://janeway.systems">{% svg "static/common/img/sample/janeway.svg" %}</a>
+            <a href="https://skrollsopenscience.com/">{% svg "static/common/img/sample/osp_white.svg" %}</a>
             {% endif %}
         </div>
         {% if request.journal %}
