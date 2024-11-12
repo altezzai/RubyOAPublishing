@@ -180,13 +180,13 @@
 
 
 <footer class="main-footer row expanded">
-        <div class="large-2 columns very-dark-primary-color text-center logo-wrapper">
+        <div class="large-2 columns primary-light-color text-center logo-wrapper">
             {% if request.journal.press_image_override %}
                 {% svg_or_image request.journal.press_image_override %}
             {% elif 'svg' in request.press_cover %}
                 <a href="{% press_url request %}">{% svg request.press_cover %}</a>
             {% else %}
-                <a href="https://skrollsopenscience.com/">{% svg "static/common/img/sample/osp_white.svg" %}</a>
+                <a href="https://skrollsopenscience.com/">{% svg "static/common/img/sample/osp_black.svg" %}</a>
             {% endif %}
         </div>
         {% if request.journal %}

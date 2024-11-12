@@ -463,6 +463,10 @@ main section {
   background: var(--very-dark-primary-color);
 }
 
+.primary-light-color {
+  background-color: var(--primary-light-color);
+}
+
 .button.success {
   background-color: var(--primary-dark-color);
 }
@@ -1180,9 +1184,8 @@ button.list-group-item-danger.active:focus {
 }
 
 .top-bar-left svg {
-  max-width: 100px;
+  max-width: 200px;
   max-height: 49px;
-  fill: var(--primary-dark-color);
 }
 
 .third {
