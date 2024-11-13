@@ -318,6 +318,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
             dynamic_choices=TIMEZONE_CHOICES,
             verbose_name=_("Preferred Timezone")
         )
+    department_id = models.IntegerField(null=True, blank=True)
+    college_id = models.IntegerField(null=True, blank=True)
+    university_id = models.IntegerField(null=True, blank=True)
+    phone = models.CharField(max_length=50, null=True, blank=True, verbose_name=_('Phone'))
 
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
