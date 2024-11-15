@@ -6,8 +6,8 @@
         <h3>{% trans 'Filter' %}</h3>
         <form method="GET" id={{ facet_form.id }}>
             {{ facet_form|foundation }}
-            <button action="" class="button" type="submit">{% trans 'Apply' %}</button>
-            <a href="{{ request.path }}" class="button warning">{% trans 'Clear all' %}</a>
+            <button action="" class="button btn-ruby" type="submit">{% trans 'Apply' %}</button>
+            <a href="{{ request.path }}" class="button btn-ruby warning ">{% trans 'Clear all' %}</a>
         </form>
     </section>
 {% endif %}

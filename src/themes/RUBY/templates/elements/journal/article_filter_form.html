@@ -32,8 +32,8 @@
                 {% if section.id in filters %} checked="checked" {% endif %}>
             <label for="section-{{ section.id }}">{{ section.name }}</label>
         {% endfor %}
-        <button type="submit" class="button">{% trans "Filter" %}</button>
+        <button type="submit" class="button btn-ruby">{% trans "Filter" %}</button>
         {% if active_filters %}
-            <button type="submit" class="button" name="clear">{% trans "Clear Filters" %}</button>{% endif %}
+            <button type="submit" class="button btn-ruby" name="clear">{% trans "Clear Filters" %}</button>{% endif %}
     </div>
 </form>
