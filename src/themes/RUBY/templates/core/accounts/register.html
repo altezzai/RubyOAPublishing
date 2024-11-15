@@ -30,7 +30,7 @@
                         </ul>
                         <p>{% blocktrans %}For more information read our <a href="#" data-open="password-modal">password guide</a>.{% endblocktrans %}</p>
 
-                        {% include "common/elements/orcid_registration.html" with button_classes="button expanded orcid-button" %}
+                        {% include "common/elements/orcid_registration.html" with button_classes="button expanded orcid-button btn-ruby" %}
 
                         {% include "elements/forms/errors.html" with form=form %}
 
@@ -79,7 +79,7 @@
                                 {{ form.password_2|foundation }}
                             </div>
                         </div>
-                        <div class="row">
+                        {% comment %} <div class="row">
                             <div class="large-12 columns">
                                 {{ form.captcha|foundation }}
                                 <br/>
@@ -88,12 +88,12 @@
                                     {% include "common/accounts/register_privacy_policy.html" %}
                                 </p>
                             </div>
-                        </div>
+                        </div> {% endcomment %}
                         {% if journal_settings.general.display_register_page_notice %}
                         {{ journal_settings.general.register_page_notice|safe }}
                         {% endif %}
                         <p>
-                            <button type="submit" class="success button float-right">{% trans "Register" %}</button>
+                            <button type="submit" class="button float-right btn-ruby">{% trans "Register" %}</button>
                         </p>
                     </div>
                 </div>

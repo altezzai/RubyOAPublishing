@@ -1383,3 +1383,42 @@ button.list-group-item-danger.active:focus {
 .decade_list_item:hover {
   text-decoration: underline;
 }
+
+.btn-ruby {
+  border-radius: 0.3rem;
+  font-weight: bold;
+}
+
+.orcid-button {
+  background-color: white;
+  border: 1px solid black;
+  color: black;
+  transition: background-color 0.1s ease-in-out;
+
+  &:hover {
+    background-color: black;
+    color: white;
+  }
+}
+
+.seperator {
+  height: 1px;
+  width: 100%;
+  background-color: rgb(230, 230, 230);
+  margin: 2rem 0;
+
+  span {
+    background-color: white;
+    color: rgb(139, 139, 139);
+    padding: 0.2rem .5rem;
+    position: absolute;
+    line-height: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.bold-title{
+  font-weight: bold;
+  font-size: larger;
+}

@@ -325,6 +325,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    is_author = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_banned = models.BooleanField(default=False)
     is_citizen_active = models.BooleanField(default=False)

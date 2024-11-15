@@ -510,7 +510,10 @@ def register(request):
             else:
                 new_user = form.save()
                 if request.journal:
+                    new_user.is_author = True
+                    new_user.save()
                     new_user.add_account_role("author", request.journal)
+                    
                 logic.send_confirmation_link(request, new_user)
                 if is_api_request:
                     return JsonResponse(
