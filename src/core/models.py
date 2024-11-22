@@ -421,6 +421,11 @@ class AccountManager(BaseUserManager):
 class Account(AbstractBaseUser, PermissionsMixin):
     email = PGCaseInsensitiveEmailField(unique=True, verbose_name=_("Email"))
     username = models.CharField(max_length=254, unique=True, verbose_name=_("Username"))
+    osp_username = models.CharField(
+        max_length=254,
+        unique=True,
+        verbose_name=_("OSP username"),
+    )
 
     name_prefix = models.CharField(max_length=10, blank=True)
     first_name = models.CharField(
@@ -577,7 +582,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.full_name()
-    
+
     def is_citizen_currently_banned(self):
         """
         Checks if the user is currently banned on citizen science, taking into account ban duration
@@ -585,11 +590,11 @@ class Account(AbstractBaseUser, PermissionsMixin):
         """
         if not self.is_banned:
             return False
-            
+
         if not self.ban_duration:
-            # If banned but no duration set, treat as permanent ban
+            # If banned but duration is 0, treat as permanent ban
             return True
-            
+
         ban_end_time = self.banned_at + timezone.timedelta(hours=self.ban_duration)
         if timezone.now() >= ban_end_time:
             # Ban has expired - automatically unban the user
@@ -598,7 +603,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
             self.ban_duration = None
             self.save()
             return False
-            
+
         return True
 
     def password_policy_check(self, request, password):

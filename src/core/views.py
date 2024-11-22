@@ -526,7 +526,9 @@ def register(request):
                     new_user.is_author = True
                     new_user.save()
                     new_user.add_account_role("author", request.journal)
-                    
+                new_user.osp_username = new_user.email
+                new_user.save()
+
                 logic.send_confirmation_link(request, new_user)
                 if is_api_request:
                     return JsonResponse(

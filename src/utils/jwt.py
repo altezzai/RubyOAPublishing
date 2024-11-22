@@ -12,7 +12,8 @@ def generate_jwt_token(user):
     """
     payload = {
         "user_id": user.id,
-        "username": user.username,
+        "username": user.osp_username,
+        "profile_image": user.profile_image.url,
         "exp": dt.datetime.now(dt.timezone.utc)
         + dt.timedelta(days=1),  # Token expires in 1 day
     }
