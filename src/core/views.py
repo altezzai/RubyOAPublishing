@@ -33,6 +33,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 from django.utils import translation
+from django.middleware.csrf import get_token
 from django.db.models import Q, OuterRef, Subquery, Count, Avg
 from django.views import generic
 
@@ -68,7 +69,9 @@ logger = get_logger(__name__)
 
 @ensure_csrf_cookie
 def set_csrf_token(request):
-    return JsonResponse({"success": True, "message": "CSRF cookie set"})
+    return JsonResponse(
+        {"success": True, "message": "CSRF cookie set", "csrfToken": get_token(request)}
+    )
 
 
 def user_login(request):
@@ -77,7 +80,10 @@ def user_login(request):
     :param request: HttpRequest
     :return: HttpResponse or JsonResponse
     """
-    is_api_request = request.headers.get("X-Api-Request") == "true"
+    is_citizen_science_request = request.headers.get("X-Frontend-Origin") == "citizenScience"
+    is_knowledge_commons_request = request.headers.get("X-Frontend-Origin") == "knowledgeCommons"
+    is_api_request = is_citizen_science_request | is_knowledge_commons_request
+
 
     if request.user.is_authenticated:
         ret_message = "You are already logged in."
@@ -109,12 +115,19 @@ def user_login(request):
             )
 
             if user is not None:
-                if user.is_banned:
-                    message = "You are banned from logging in."
-                    if is_api_request:
-                        return JsonResponse({"success": False, "message": message})
-                    messages.info(request, message)
-                    return redirect(request.GET.get("next") or reverse("core_login"))
+                if is_citizen_science_request  and  user.is_citizen_currently_banned():
+                    ban_end_time = user.banned_at + timezone.timedelta(hours=user.ban_duration)
+                    if user.ban_duration:
+                        message = f"You are banned from logging in. Your ban will expire on {ban_end_time.strftime('%Y-%m-%d %H:%M:%S')}."
+                    else:
+                        message = "You are permanently banned from logging in."
+
+                    return JsonResponse({
+                        "success": False, 
+                        "message": message,
+                        "ban_end_time": ban_end_time.isoformat() if user.ban_duration else None
+                    })
+                    
                 login(request, user)
                 logic.clear_bad_login_attempts(request)
                 if orcid_token:
@@ -573,6 +586,7 @@ def activate_account(request, token):
 
     if account and (request.POST or is_api_request):
         account.is_active = True
+        account.is_citizen_active = True
         account.confirmation_code = None
         account.save()
 

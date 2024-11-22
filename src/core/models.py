@@ -577,6 +577,29 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.full_name()
+    
+    def is_citizen_currently_banned(self):
+        """
+        Checks if the user is currently banned on citizen science, taking into account ban duration
+        Returns True if the user is banned and the ban period hasn't expired
+        """
+        if not self.is_banned:
+            return False
+            
+        if not self.ban_duration:
+            # If banned but no duration set, treat as permanent ban
+            return True
+            
+        ban_end_time = self.banned_at + timezone.timedelta(hours=self.ban_duration)
+        if timezone.now() >= ban_end_time:
+            # Ban has expired - automatically unban the user
+            self.is_banned = False
+            self.banned_at = None
+            self.ban_duration = None
+            self.save()
+            return False
+            
+        return True
 
     def password_policy_check(self, request, password):
         rules = [lambda s: len(password) >= request.press.password_length or "length"]
