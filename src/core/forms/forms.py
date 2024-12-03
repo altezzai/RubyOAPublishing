@@ -240,6 +240,7 @@ class EditAccountForm(forms.ModelForm):
             "password",
             "is_superuser",
             "enable_digest",
+            "osp_username",
         )
         widgets = {
             "biography": TinyMCE(),
@@ -271,7 +272,14 @@ class AdminUserForm(forms.ModelForm):
 
     class Meta:
         model = models.Account
-        fields = ("email", "is_active", "is_staff", "is_admin", "is_superuser")
+        fields = (
+            "email",
+            "is_active",
+            "is_staff",
+            "is_admin",
+            "is_superuser",
+            "is_citizen_active",
+        )
 
     def __init__(self, *args, **kwargs):
         active = kwargs.pop("active", None)
@@ -676,9 +684,9 @@ class CBVFacetForm(forms.Form):
         # so users only see filter options that will have an effect on the
         # current results.
 
-        self.id = 'facet_form'
-        self.queryset = kwargs.pop('queryset')
-        self.facets = kwargs.pop('facets')
+        self.id = "facet_form"
+        self.queryset = kwargs.pop("queryset")
+        self.facets = kwargs.pop("facets")
         self.fields = {}
 
         super().__init__(*args, **kwargs)
@@ -719,7 +727,7 @@ class CBVFacetForm(forms.Form):
 
                 column = []
                 values_list = []
-                lookup_parts = facet_key.split('.')
+                lookup_parts = facet_key.split(".")
                 for obj in self.queryset:
                     for part in lookup_parts:
                         if obj:

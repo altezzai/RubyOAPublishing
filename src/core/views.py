@@ -139,7 +139,7 @@ def user_login(request):
                         )
                     else:
                         user.is_citizen_active = True
-                        
+                        user.save()
 
                 login(request, user)
                 logic.clear_bad_login_attempts(request)
