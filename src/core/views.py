@@ -80,10 +80,13 @@ def user_login(request):
     :param request: HttpRequest
     :return: HttpResponse or JsonResponse
     """
-    is_citizen_science_request = request.headers.get("X-Frontend-Origin") == "citizenScience"
-    is_knowledge_commons_request = request.headers.get("X-Frontend-Origin") == "knowledgeCommons"
+    is_citizen_science_request = (
+        request.headers.get("X-Frontend-Origin") == "citizenScience"
+    )
+    is_knowledge_commons_request = (
+        request.headers.get("X-Frontend-Origin") == "knowledgeCommons"
+    )
     is_api_request = is_citizen_science_request | is_knowledge_commons_request
-
 
     if request.user.is_authenticated:
         ret_message = "You are already logged in."
@@ -115,19 +118,29 @@ def user_login(request):
             )
 
             if user is not None:
-                if is_citizen_science_request  and  user.is_citizen_currently_banned():
-                    ban_end_time = user.banned_at + timezone.timedelta(hours=user.ban_duration)
-                    if user.ban_duration:
-                        message = f"You are banned from logging in. Your ban will expire on {ban_end_time.strftime('%Y-%m-%d %H:%M:%S')}."
-                    else:
-                        message = "You are permanently banned from logging in."
+                if is_citizen_science_request:
+                    if user.is_citizen_currently_banned():
+                        ban_end_time = user.banned_at + timezone.timedelta(
+                            hours=user.ban_duration
+                        )
+                        if user.ban_duration:
+                            message = f"You are banned from logging in. Your ban will expire on {ban_end_time.strftime('%Y-%m-%d %H:%M:%S')}."
+                        else:
+                            message = "You are permanently banned from logging in."
 
-                    return JsonResponse({
-                        "success": False, 
-                        "message": message,
-                        "ban_end_time": ban_end_time.isoformat() if user.ban_duration else None
-                    })
-                    
+                        return JsonResponse(
+                            {
+                                "success": False,
+                                "message": message,
+                                "ban_end_time": (
+                                    ban_end_time.isoformat() if user.ban_duration else None
+                                ),
+                            }
+                        )
+                    else:
+                        user.is_citizen_active = True
+                        
+
                 login(request, user)
                 logic.clear_bad_login_attempts(request)
                 if orcid_token:

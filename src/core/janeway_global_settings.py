@@ -50,7 +50,27 @@ JWT_SECRET_KEY = os.environ.get("JWTSECRET", "jwtsecretdefault")
 DEBUG = True
 COMMAND = sys.argv[1:]
 IN_TEST_RUNNER = COMMAND[:1] == ["test"]
-ALLOWED_HOSTS = ["*"]
+
+ALLOWED_HOSTS = ["http://localhost:5173","*" ]
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",
+# ]
+CORS_ALLOW_ALL_ORIGINS = True  # should be False in production
+CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_HEADERS = [
+#     "content-type",
+#     "authorization",
+#     "X-CSRFToken",
+#     "x-api-Request",
+# ]
+
+# CSRF_TRUSTED_ORIGINS = [
+#     "http://localhost:5173",
+# ]
+# CSRF_COOKIE_SECURE = True  # should be True in production
+# CSRF_COOKIE_HTTPONLY = False  # should be True in production
+# CSRF_COOKIE_SAME_SITE = "Lax"
 
 ENABLE_TEXTURE = False
 
@@ -107,6 +127,7 @@ INSTALLED_APPS = [
     "hijack",
     "hcaptcha",
     "django_bleach",
+    "corsheaders",
     # Forms
     "django.forms",
 ]
@@ -116,8 +137,9 @@ INSTALLED_APPS += plugin_installed_apps.load_homepage_element_apps(BASE_DIR)
 
 MIDDLEWARE = (
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -170,11 +192,11 @@ TEMPLATES = [
                 "django.template.loaders.filesystem.Loader",
                 "django.template.loaders.app_directories.Loader",
             ],
-            'builtins': [
-                'core.templatetags.fqdn',
-                'security.templatetags.securitytags',
-                'django.templatetags.i18n',
-            ]
+            "builtins": [
+                "core.templatetags.fqdn",
+                "security.templatetags.securitytags",
+                "django.templatetags.i18n",
+            ],
         },
     },
 ]
@@ -605,12 +627,7 @@ SITE_SEARCH_INDEXING_FREQUENCY = None
 SITE_SEARCH_DIR = "site_search_test" if IN_TEST_RUNNER else "site_search"
 
 # A core theme must include ALL templates.
-CORE_THEMES = [
-    "OLH",
-    "material",
-    "clean",
-    "RUBY"
-]
+CORE_THEMES = ["OLH", "material", "clean", "RUBY"]
 
 # Repository theme setting determines which themes currently
 # support repositories.
