@@ -51,7 +51,7 @@ DEBUG = True
 COMMAND = sys.argv[1:]
 IN_TEST_RUNNER = COMMAND[:1] == ["test"]
 
-ALLOWED_HOSTS = ["http://localhost:5173","*" ]
+ALLOWED_HOSTS = ["http://localhost:5173", "*"]
 
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:5173",
@@ -113,6 +113,7 @@ INSTALLED_APPS = [
     "transform",
     "utils",
     "workflow",
+    "knowledge_connector",
     # 3rd Party
     "mozilla_django_oidc",
     "django_summernote",
