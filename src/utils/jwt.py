@@ -20,3 +20,11 @@ def generate_jwt_token(user):
         + dt.timedelta(days=1),  # Token expires in 1 day
     }
     return jwt.encode(payload, django_settings.JWT_SECRET_KEY, algorithm="HS256")
+
+
+def decode_jwt_token(request):
+    """
+    Decode a JWT token
+    """
+    token = request.headers.get("Authorization", "").split(" ")[1]
+    return jwt.decode(token, django_settings.JWT_SECRET_KEY, algorithms=["HS256"])

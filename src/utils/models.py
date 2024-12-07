@@ -49,6 +49,7 @@ EMAIL_RECIPIENT_FIELDS = [
     ('bcc', 'BCC'),
 ]
 
+
 class LogEntry(models.Model):
     types = models.CharField(max_length=255, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)

@@ -347,6 +347,29 @@ TIMEZONE_CHOICES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
 
 SUMMERNOTE_SENTINEL = "<p><br></p>"
 
+OSPRoles = {
+    "USER": "user",
+    "SUPER_ADMIN": "super_admin",
+    "CITIZEN_SUPPORT": "citizen_support",
+    "KNOWLEDGE_SUPPORT": "knowledge_support",
+    "CHIEF_EDITOR": "chief_editor",
+    "EDITOR": "editor",
+    "PROOF_READER": "proof_reader",
+    "SCIENCE_COMMUNICATOR": "science_communicator",
+}
+
+
+OSP_ROLES = (
+    ("user", "user"),
+    ("super_admin", "super_admin"),
+    ("citizen_support", "citizen_support"),
+    ("knowledge_support", "knowledge_support"),
+    ("chief_editor", "chief_editor"),
+    ("editor", "editor"),
+    ("proof_reader", "proof_reader"),
+    ("science_communicator", "science_communicator"),
+)
+
 
 class Country(models.Model):
     code = models.TextField(max_length=5)
@@ -425,6 +448,13 @@ class Account(AbstractBaseUser, PermissionsMixin):
         max_length=254,
         unique=True,
         verbose_name=_("OSP username"),
+    )
+
+    osp_role = models.CharField(
+        max_length=20,
+        choices=OSP_ROLES,
+        default="user",
+        verbose_name=_("OSP Role"),
     )
 
     name_prefix = models.CharField(max_length=10, blank=True)

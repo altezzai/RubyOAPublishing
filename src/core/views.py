@@ -80,13 +80,7 @@ def user_login(request):
     :param request: HttpRequest
     :return: HttpResponse or JsonResponse
     """
-    is_citizen_science_request = (
-        request.headers.get("X-Frontend-Origin") == "citizenScience"
-    )
-    is_knowledge_commons_request = (
-        request.headers.get("X-Frontend-Origin") == "knowledgeCommons"
-    )
-    is_api_request = is_citizen_science_request | is_knowledge_commons_request
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
 
     if request.user.is_authenticated:
         ret_message = "You are already logged in."
@@ -118,7 +112,7 @@ def user_login(request):
             )
 
             if user is not None:
-                if is_citizen_science_request:
+                if logic.is_citizen_request(request):
                     if user.is_citizen_currently_banned():
                         ban_end_time = user.banned_at + timezone.timedelta(
                             hours=user.ban_duration
@@ -133,7 +127,9 @@ def user_login(request):
                                 "success": False,
                                 "message": message,
                                 "ban_end_time": (
-                                    ban_end_time.isoformat() if user.ban_duration else None
+                                    ban_end_time.isoformat()
+                                    if user.ban_duration
+                                    else None
                                 ),
                             }
                         )
@@ -240,7 +236,7 @@ def user_login_orcid(request):
     """
     orcid_code = request.GET.get("code", None)
     action = request.GET.get("state", "login")
-    is_api_request = request.GET.get("is_api") == "true"
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
 
     if orcid_code and django_settings.ENABLE_ORCID:
         orcid_id = orcid.retrieve_tokens(orcid_code, request.site_type, action=action)
@@ -334,7 +330,7 @@ def user_logout(request):
     :param request: HttpRequest object
     :return: HttpResponse object
     """
-    is_api_request = request.headers.get("X-Api-Request") == "true"
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
     ret_message = "You have been logged out."
     if is_api_request:
         return JsonResponse({"success": True, "message": ret_message})
@@ -349,7 +345,7 @@ def get_reset_token(request):
     :param request: HttpRequest object
     :return: HttpResponse object
     """
-    is_api_request = request.headers.get("X-Api-Request") == "true"
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
     form = forms.GetResetTokenForm()
 
     if request.POST:
@@ -396,7 +392,7 @@ def reset_password(request, token):
     :return: HttpResponse object
     """
 
-    is_api_request = request.headers.get("X-Api-Request") == "true"
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
     try:
         reset_token = models.PasswordResetToken.objects.get(token=token, expired=False)
     except models.PasswordResetToken.DoesNotExist:
@@ -472,7 +468,9 @@ def register(request):
     """
     context = {}
     initial = {}
-    is_api_request = request.headers.get("X-Api-Request") == "true"
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(
+        request
+    )
 
     data = request.POST
 
@@ -534,12 +532,45 @@ def register(request):
                     else:
                         return redirect(reverse("website_index"))
             else:
-                new_user = form.save()
+                new_user = None
+                if logic.is_create_staff_request(request):
+                    new_user = form.save(commit=False)
+                    is_super_admin = (
+                        logic.get_user_osp_role(request)
+                        == models.OSPRoles["SUPER_ADMIN"]
+                    )
+                    if is_super_admin:
+                        res = logic.mutate_user_role(new_user, data.get("osp_role"))
+                        if res:
+                            return JsonResponse(
+                                {
+                                    "success": True,
+                                    "message": f"{data.get("osp_role")} created",
+                                }
+                            )
+                        else:
+                            return JsonResponse(
+                                {
+                                    "success": False,
+                                    "message": "Invalid role",
+                                }
+                            )
+                    else:
+                        return JsonResponse(
+                            {
+                                "success": False,
+                                "message": "Only super admin can register staff for Knowledge Commons",
+                            },
+                            status=403,
+                        )
+
+                else:
+                    new_user = form.save()
+
                 if request.journal:
-                    new_user.is_author = True
-                    new_user.save()
+                    new_user.is_user_author = True
                     new_user.add_account_role("author", request.journal)
-                new_user.osp_username = new_user.email
+
                 new_user.save()
 
                 logic.send_confirmation_link(request, new_user)
@@ -592,7 +623,7 @@ def activate_account(request, token):
     :return: HttpResponse object or JsonResponse object
     """
 
-    is_api_request = request.headers.get("X-Api-Request") == "true"
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
 
     try:
         account = models.Account.objects.get(confirmation_code=token, is_active=False)

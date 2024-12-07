@@ -205,6 +205,7 @@ class RegistrationForm(forms.ModelForm, CaptchaForm):
         user = super(RegistrationForm, self).save(commit=False)
         user.set_password(self.cleaned_data["password_1"])
         user.is_active = False
+        user.osp_username = user.email
         user.confirmation_code = uuid.uuid4()
         user.email_sent = timezone.now()
 
