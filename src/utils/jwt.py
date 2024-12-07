@@ -10,10 +10,12 @@ def generate_jwt_token(user):
     """
     Generate a JWT token for the given user
     """
+    
     payload = {
         "user_id": user.id,
         "username": user.osp_username,
-        "profile_image": user.profile_image.url,
+        "role": user.osp_role,
+        "profile_image": user.profile_image.url if user.profile_image else "",
         "is_citizen_active": user.is_citizen_active,
         "is_knowledge_active": user.is_active,
         "exp": dt.datetime.now(dt.timezone.utc)
