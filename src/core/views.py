@@ -80,7 +80,9 @@ def user_login(request):
     :param request: HttpRequest
     :return: HttpResponse or JsonResponse
     """
-    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(
+        request
+    )
 
     if request.user.is_authenticated:
         ret_message = "You are already logged in."
@@ -236,7 +238,9 @@ def user_login_orcid(request):
     """
     orcid_code = request.GET.get("code", None)
     action = request.GET.get("state", "login")
-    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(
+        request
+    )
 
     if orcid_code and django_settings.ENABLE_ORCID:
         orcid_id = orcid.retrieve_tokens(orcid_code, request.site_type, action=action)
@@ -330,12 +334,14 @@ def user_logout(request):
     :param request: HttpRequest object
     :return: HttpResponse object
     """
-    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(
+        request
+    )
     ret_message = "You have been logged out."
+    logout(request)
     if is_api_request:
         return JsonResponse({"success": True, "message": ret_message})
     messages.info(request, _(ret_message))
-    logout(request)
     return redirect(reverse("website_index"))
 
 
@@ -345,7 +351,9 @@ def get_reset_token(request):
     :param request: HttpRequest object
     :return: HttpResponse object
     """
-    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(
+        request
+    )
     form = forms.GetResetTokenForm()
 
     if request.POST:
@@ -392,7 +400,9 @@ def reset_password(request, token):
     :return: HttpResponse object
     """
 
-    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(
+        request
+    )
     try:
         reset_token = models.PasswordResetToken.objects.get(token=token, expired=False)
     except models.PasswordResetToken.DoesNotExist:
@@ -623,7 +633,9 @@ def activate_account(request, token):
     :return: HttpResponse object or JsonResponse object
     """
 
-    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(request)
+    is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(
+        request
+    )
 
     try:
         account = models.Account.objects.get(confirmation_code=token, is_active=False)
