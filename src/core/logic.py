@@ -74,12 +74,18 @@ def send_reset_token(request, reset_token):
 
 
 def send_confirmation_link(request, new_user):
-    core_confirm_account_url = request.site_type.site_url(
-        reverse(
-            "core_confirm_account",
-            kwargs={"token": new_user.confirmation_code},
+    core_confirm_account_url = ""
+    if is_citizen_request(request):
+        core_confirm_account_url = f"{settings.CITIZEN_SCIENCE_BASE_URL}/register/verify_email/{str(new_user.confirmation_code)}"
+    elif is_knowledge_request(request):
+        core_confirm_account_url = f"{settings.KNOWLEDGE_COMMON_BASE_URL}/register/verify_email/{str(new_user.confirmation_code)}"
+    else:
+        core_confirm_account_url = request.site_type.site_url(
+            reverse(
+                "core_confirm_account",
+                kwargs={"token": new_user.confirmation_code},
+            )
         )
-    )
     context = {
         "user": new_user,
         "core_confirm_account_url": core_confirm_account_url,

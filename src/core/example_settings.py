@@ -73,3 +73,6 @@ ENABLE_FULL_TEXT_SEARCH = False  # Read the docs before enabling full text
 
 # Model used for indexing full text files
 CORE_FILETEXT_MODEL = "core.FileText"  # Use "core.PGFileText" for Postgres
+
+CITIZEN_SCIENCE_BASE_URL = "http://localhost:5173"
+KNOWLEDGE_COMMON_BASE_URL = "http://localhost:5173"

@@ -224,7 +224,7 @@ def user_login(request):
         return render(request, "core/login.html", context)
 
     if is_api_request:
-        return JsonResponse({"success": False, "message": "Invalid request method."})
+        return JsonResponse({"success": False, "message": "You are not logged in."})
 
     context = {"form": form}
     return render(request, "core/login.html", context)
@@ -334,6 +334,7 @@ def user_logout(request):
     :param request: HttpRequest object
     :return: HttpResponse object
     """
+
     is_api_request = logic.is_citizen_request(request) | logic.is_knowledge_request(
         request
     )
@@ -571,11 +572,26 @@ def register(request):
                                 "success": False,
                                 "message": "Only super admin can register staff for Knowledge Commons",
                             },
-                            status=403,
                         )
 
                 else:
-                    new_user = form.save()
+                    new_user = None
+                    if data.get("username"):
+                        user = models.Account.objects.filter(
+                            osp_username=data.get("username")
+                        )
+                        if user:
+                            return JsonResponse(
+                                {
+                                    "success": False,
+                                    "message": "Username already exists",
+                                }
+                            )
+                        else:
+                            new_user = form.save()
+                            new_user.osp_username = data.get("username")
+                    else:
+                        new_user = form.save()
 
                 if request.journal:
                     new_user.is_user_author = True
@@ -667,8 +683,7 @@ def activate_account(request, token):
                 {
                     "success": False,
                     "message": "Invalid token or account already active",
-                },
-                status=404,
+                }
             )
 
     template = "core/accounts/activate_account.html"

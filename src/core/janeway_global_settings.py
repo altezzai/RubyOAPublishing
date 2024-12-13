@@ -51,19 +51,20 @@ DEBUG = True
 COMMAND = sys.argv[1:]
 IN_TEST_RUNNER = COMMAND[:1] == ["test"]
 
+#############################################################################################
 ALLOWED_HOSTS = ["http://localhost:5173", "*"]
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5173",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
 CORS_ALLOW_ALL_ORIGINS = True  # should be False in production
 CORS_ALLOW_CREDENTIALS = True
-# CORS_ALLOW_HEADERS = [
-#     "content-type",
-#     "authorization",
-#     "X-CSRFToken",
-#     "x-api-Request",
-# ]
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "X-CSRFToken",
+    "x-frontend-origin",
+]
 
 # CSRF_TRUSTED_ORIGINS = [
 #     "http://localhost:5173",
@@ -71,7 +72,7 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF_COOKIE_SECURE = True  # should be True in production
 # CSRF_COOKIE_HTTPONLY = False  # should be True in production
 # CSRF_COOKIE_SAME_SITE = "Lax"
-
+#############################################################################################
 ENABLE_TEXTURE = False
 
 FILE_UPLOAD_PERMISSIONS = 0o644
