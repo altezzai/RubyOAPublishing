@@ -790,7 +790,7 @@ def send_article_to_knowledge_commons(request, article, **kwargs):
             ),
             "doi": article.get_doi() or "",
             "language": article.language or "",
-            "user_id": request.user.id,
+            "user_id": article.owner.id,
             "status": "pending",
             "views": 0,
             "downloads": 0,
