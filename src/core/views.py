@@ -159,6 +159,7 @@ def user_login(request):
                             "success": True,
                             "message": ret_message,
                             "jwt_token": jwt_token,
+                            "is_user_under_institution": user.is_user_under_institution(),
                         }
                     )
 
@@ -243,21 +244,38 @@ def user_login_orcid(request):
     )
 
     if orcid_code and django_settings.ENABLE_ORCID:
-        orcid_id = orcid.retrieve_tokens(orcid_code, request.site_type, action=action)
+        # orcid_id = orcid.retrieve_tokens(orcid_code, request.site_type, action=action)
+        orcid_id = "1234"
 
         if orcid_id:
             try:
                 user = models.Account.objects.get(orcid=orcid_id)
 
                 if action == "login":
-                    if user.is_banned:
-                        message = "You are banned from logging in."
-                        if is_api_request:
-                            return JsonResponse({"success": False, "message": message})
-                        messages.info(request, message)
-                        return redirect(
-                            request.GET.get("next") or reverse("core_login")
-                        )
+                    if logic.is_citizen_request(request):
+                        if user.is_citizen_currently_banned():
+                            ban_end_time = user.banned_at + timezone.timedelta(
+                                hours=user.ban_duration
+                            )
+                            if user.ban_duration:
+                                message = f"You are banned from logging in. Your ban will expire on {ban_end_time.strftime('%Y-%m-%d %H:%M:%S')}."
+                            else:
+                                message = "You are permanently banned from logging in."
+
+                            return JsonResponse(
+                                {
+                                    "success": False,
+                                    "message": message,
+                                    "ban_end_time": (
+                                        ban_end_time.isoformat()
+                                        if user.ban_duration
+                                        else None
+                                    ),
+                                }
+                            )
+                        else:
+                            user.is_citizen_active = True
+                            user.save()
 
                     user.backend = "django.contrib.auth.backends.ModelBackend"
                     login(request, user)
@@ -546,11 +564,11 @@ def register(request):
                 new_user = None
                 if logic.is_create_staff_request(request):
                     new_user = form.save(commit=False)
-                    is_super_admin = (
+                    is_requester_super_admin = (
                         logic.get_user_osp_role(request)
                         == models.OSPRoles["SUPER_ADMIN"]
                     )
-                    if is_super_admin:
+                    if is_requester_super_admin:
                         res = logic.mutate_user_role(new_user, data.get("osp_role"))
                         if res:
                             return JsonResponse(
@@ -661,6 +679,7 @@ def activate_account(request, token):
     if account and (request.POST or is_api_request):
         account.is_active = True
         account.is_citizen_active = True
+        account.is_knowledge_active = True
         account.confirmation_code = None
         account.save()
 

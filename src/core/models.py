@@ -456,7 +456,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
         default="user",
         verbose_name=_("OSP Role"),
     )
-
+    osp_royalty_score = models.IntegerField(
+        default=0,
+        verbose_name=_("OSP Royalty Score"),
+    )
     name_prefix = models.CharField(max_length=10, blank=True)
     first_name = models.CharField(
         max_length=300,
@@ -564,15 +567,19 @@ class Account(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(
         max_length=50, null=True, blank=True, verbose_name=_("Phone")
     )
-
+    college_verification_id = models.CharField(
+        max_length=50, null=True, blank=True, verbose_name=_("College Verification ID")
+    )
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_user_author = models.BooleanField(default=False)
+    knowledge_approved = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_banned = models.BooleanField(default=False)
     banned_at = models.DateTimeField(blank=True, null=True)
     ban_duration = models.IntegerField(blank=True, null=True)
     is_citizen_active = models.BooleanField(default=False)
+    is_knowledge_active = models.BooleanField(default=False)
 
     enable_digest = models.BooleanField(
         default=False,
@@ -612,6 +619,25 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.full_name()
+
+    def is_knowledge_staff(self):
+        if self.osp_role == "user" or self.osp_role == "super_admin":
+            return False
+        return True
+    
+    def is_osp_super_admin(self):
+        if self.osp_role == "super_admin":
+            return True
+        return False
+
+    def is_user_under_institution(self):
+        if not self.college_id:
+            return False
+        if not self.university_id:
+            return False
+        if not self.department_id:
+            return False
+        return True
 
     def is_citizen_currently_banned(self):
         """

@@ -773,7 +773,6 @@ def send_article_to_knowledge_commons(request, article, **kwargs):
 
         file_path = str(article.manuscript_files.first()) or None
         cover_image = str(article.thumbnail_image_file) or None
-        print(cover_image, "cover_image")
 
         submission_data = {
             "submission_type": "article",
