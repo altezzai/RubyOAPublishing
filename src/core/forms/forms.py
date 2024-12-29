@@ -243,6 +243,7 @@ class EditAccountForm(forms.ModelForm):
             "enable_digest",
             "osp_username",
             "osp_role",
+            "osp_royalty_score",
         )
         widgets = {
             "biography": TinyMCE(),
